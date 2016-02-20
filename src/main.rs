@@ -54,15 +54,27 @@ impl Timestamp {
 						let temp: std::vec::Vec<&str> = chunk.split(|c| c == ',' || c == '.').collect();
 						for chunk2 in temp {
 							match j {
-								0 => new_ms = new_ms + chunk2.parse::<i32>().unwrap() * 1000,
-								1 => new_ms = new_ms + chunk2.parse::<i32>().unwrap(),
+								0 => new_ms = new_ms + 1000 * match chunk2.parse::<i32>() {
+									Ok(value) => value,
+									_ => return None
+								},
+								1 => new_ms = new_ms + match chunk2.parse::<i32>() {
+									Ok(value) => value,
+									_ => return None
+								},
 								_ => return None
 							}
 							j = j + 1;
 						}
 				},
-				1 => new_ms = new_ms + chunk.parse::<i32>().unwrap() * 60 * 1000,
-				2 => new_ms = new_ms + chunk.parse::<i32>().unwrap() * 60 * 60 * 1000,
+				1 => new_ms = new_ms + 60 * 1000 * match chunk.parse::<i32>() {
+						Ok(value) => value,
+						_ => return None
+					},
+				2 => new_ms = new_ms + 60 * 60 * 1000 * match chunk.parse::<i32>() {
+						Ok(value) => value,
+						_ => return None
+					},
 				_ => return None
 			}
 			i = i + 1;
@@ -113,7 +125,8 @@ impl<'a> std::ops::Sub for &'a Timestamp {
 }
 
 fn print_usage() {
-	println!("srtresync ./subs.srt +/-hh:mm:ss,xxx for fixed offset");
+	println!("srtresync 1.0 by NeoSmart Technologies. Copyright © 2016.");
+	println!("srtresync ./subs.srt [+/-]hh:mm:ss,xxx to correct fixed offset");
 	println!("srtresync ./subs.srt hh:mm:ss,xxx-hh:mm:ss,xxx hh:mm:ss,xxx-hh:mm:ss,xxx to correct linear drift");
 }
 
@@ -132,24 +145,35 @@ fn apply_drift(drift: (f32, i32), ts: Timestamp) -> Timestamp {
 	Timestamp::new(ts.total_milliseconds + offset)
 }
 
-fn invalid_timestamp_format() {
-	writeln!(std::io::stderr(), "The provided timestamp format is incorrect!").unwrap();
+fn invalid_timestamp_format() -> &'static str {
+	"The provided timestamp format is incorrect!"
 }
 
 fn main() {
 	let args: Vec<String> = env::args().collect();
-	let mut debug = false;
 
 	let (x, y) = match args.len() { 
+		1 => {
+			return print_usage();
+		}
 		3 => {
-			let offset = Timestamp::parse(&args[2]).unwrap();
+			let offset = match Timestamp::parse(&args[2]) {
+				Some(x) => x,
+				None => panic!(invalid_timestamp_format())
+			};
 			(1f32, offset.total_milliseconds)
 		},
 		4 => {
-			let pair1 = &args[2].split("-").map(|x| Timestamp::parse(x).unwrap()).collect::<Vec<Timestamp>>();
+			let pair1 = &args[2].split("-").map(|x| match Timestamp::parse(x) {
+				Some(x) => x,
+				None => panic!(invalid_timestamp_format())
+			}).collect::<Vec<Timestamp>>();
 			let t1 = (&pair1[0], &pair1[1]);
 
-			let pair2 = &args[3].split("-").map(|x| Timestamp::parse(x).unwrap()).collect::<Vec<Timestamp>>();
+			let pair2 = &args[3].split("-").map(|x| match Timestamp::parse(x) {
+				Some(x) => x,
+				None => panic!(invalid_timestamp_format())
+			}).collect::<Vec<Timestamp>>();
 			let t2 = (&pair2[0], &pair2[1]);
 
 			calculate_drift(t1, t2)
@@ -174,7 +198,7 @@ fn main() {
 	let mut print_next_line = false;
 	let file = BufReader::new(&fd);
     for l in file.lines().map(|x| x.unwrap()) {
-        let mut timestamp_line = false;
+        let mut timestamp_line: bool;
 
         if print_next_line && l.len() > 0 {
         	println!("{}", &l);
