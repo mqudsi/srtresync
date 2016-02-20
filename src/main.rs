@@ -50,22 +50,22 @@ impl Timestamp {
 		for chunk in chunks {
 			match i {
 				0 => {
-						let mut j = 0;
-						let temp: std::vec::Vec<&str> = chunk.split(|c| c == ',' || c == '.').collect();
-						for chunk2 in temp {
-							match j {
-								0 => new_ms = new_ms + 1000 * match chunk2.parse::<i32>() {
-									Ok(value) => value,
-									_ => return None
-								},
-								1 => new_ms = new_ms + match chunk2.parse::<i32>() {
-									Ok(value) => value,
-									_ => return None
-								},
+					let mut j = 0;
+					let temp: std::vec::Vec<&str> = chunk.split(|c| c == ',' || c == '.').collect();
+					for chunk2 in temp {
+						match j {
+							0 => new_ms = new_ms + 1000 * match chunk2.parse::<i32>() {
+								Ok(value) => value,
 								_ => return None
-							}
-							j = j + 1;
+							},
+							1 => new_ms = new_ms + match chunk2.parse::<i32>() {
+								Ok(value) => value,
+								_ => return None
+							},
+							_ => return None
 						}
+						j = j + 1;
+					}
 				},
 				1 => new_ms = new_ms + 60 * 1000 * match chunk.parse::<i32>() {
 						Ok(value) => value,
