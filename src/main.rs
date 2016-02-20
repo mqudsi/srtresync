@@ -99,29 +99,29 @@ impl Timestamp {
 }
 
 impl fmt::Display for Timestamp {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{sign}{hh:>02}:{mm:02}:{ss:02},{ms:03}", sign = if self.total_milliseconds < 0 { "-" } else { "" }, hh = self.hours(), mm = self.mins(), ss = self.secs(), ms = self.msecs())
-    }
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "{sign}{hh:>02}:{mm:02}:{ss:02},{ms:03}", sign = if self.total_milliseconds < 0 { "-" } else { "" }, hh = self.hours(), mm = self.mins(), ss = self.secs(), ms = self.msecs())
+	}
 }
 
 impl<'a> std::ops::Add for &'a Timestamp {
-    type Output = Timestamp;
+	type Output = Timestamp;
  
-    fn add(self, other: &Timestamp) -> Timestamp {
-        Timestamp {
-        	total_milliseconds: self.total_milliseconds + other.total_milliseconds
-        }
-    }
+	fn add(self, other: &Timestamp) -> Timestamp {
+		Timestamp {
+			total_milliseconds: self.total_milliseconds + other.total_milliseconds
+		}
+	}
 }
 
 impl<'a> std::ops::Sub for &'a Timestamp {
-    type Output = Timestamp;
+	type Output = Timestamp;
  
-    fn sub(self, other: &Timestamp) -> Timestamp {
-        Timestamp {
-        	total_milliseconds: self.total_milliseconds - other.total_milliseconds
-        }
-    }
+	fn sub(self, other: &Timestamp) -> Timestamp {
+		Timestamp {
+			total_milliseconds: self.total_milliseconds - other.total_milliseconds
+		}
+	}
 }
 
 fn print_usage() {
@@ -197,20 +197,20 @@ fn main() {
 	let mut subtitle_index = 0;
 	let mut print_next_line = false;
 	let file = BufReader::new(&fd);
-    for l in file.lines().map(|x| x.unwrap()) {
-        let mut timestamp_line: bool;
+	for l in file.lines().map(|x| x.unwrap()) {
+		let mut timestamp_line: bool;
 
-        if print_next_line && l.len() > 0 {
-        	println!("{}", &l);
-        	continue;
-        }
+		if print_next_line && l.len() > 0 {
+			println!("{}", &l);
+			continue;
+		}
 
-        print_next_line = false;
-        let captures = l.split("-->").collect::<Vec<&str>>();
-        if captures.len() == 2 {
-        	timestamp_line = true;
+		print_next_line = false;
+		let captures = l.split("-->").collect::<Vec<&str>>();
+		if captures.len() == 2 {
+			timestamp_line = true;
 
-        	let t1 = match Timestamp::parse(captures[0].trim()) {
+			let t1 = match Timestamp::parse(captures[0].trim()) {
 				Some(x) => x,
 				None => {
 					timestamp_line = false;
@@ -225,18 +225,18 @@ fn main() {
 				}
 			};
 
-        	if timestamp_line {
-        		let timestamps = (t1, t2);
+			if timestamp_line {
+				let timestamps = (t1, t2);
 
-	        	let new_ts = (apply_drift((x, y), timestamps.0), apply_drift((x, y), timestamps.1));
-	        	println!("\n{}", subtitle_index);
-	        	println!("{0} --> {1}", new_ts.0, new_ts.1);
-	        	print_next_line = true;
+				let new_ts = (apply_drift((x, y), timestamps.0), apply_drift((x, y), timestamps.1));
+				println!("\n{}", subtitle_index);
+				println!("{0} --> {1}", new_ts.0, new_ts.1);
+				print_next_line = true;
 
-	        	subtitle_index = subtitle_index + 1;
-	        	continue;
-        	}
-        }
-    }
-    writeln!(std::io::stderr(), "Processed {} captions", subtitle_index).unwrap();
+				subtitle_index = subtitle_index + 1;
+				continue;
+			}
+		}
+	}
+	writeln!(std::io::stderr(), "Processed {} captions", subtitle_index).unwrap();
 }
