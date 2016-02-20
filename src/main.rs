@@ -18,15 +18,15 @@ impl Timestamp {
 	}
 
 	fn mins(&self) -> i32 {
-		(self.total_milliseconds.abs() - self.hours() * (60 * 60 * 1000)) / (60 * 1000)
+		(self.total_milliseconds.abs() % (60 * 60 * 1000)) / (60 * 1000)
 	}
 
 	fn secs(&self) -> i32 {
-		(self.total_milliseconds.abs() - self.hours() * (60 * 60 * 1000) - self.mins() * (60 * 1000)) / 1000
+		(self.total_milliseconds.abs() % (60 * 1000)) / 1000
 	}
 
 	fn msecs(&self) -> i32 {
-		self.total_milliseconds.abs() - self.hours() * (60 * 60 * 1000) - self.mins() * (60 * 1000) - self.secs() * 1000
+		self.total_milliseconds.abs() % 1000
 	}
 
 	fn parse(text: &str) -> Option<Timestamp> {
