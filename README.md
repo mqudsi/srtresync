@@ -2,7 +2,7 @@
 
 `srtresync` is a simple, straight-forward, and powerful utility used to correct ("resync") drift in srt subtitle files.
 
-`srtresync` is developed and maintained by Mahmoud Al-Qudsi <mqudsi@neosmart.net> on behalf of NeoSmart Technologies, and is released completely open source under the terms of the MIT license. See the `LICENSE` file for further information.
+`srtresync` is developed and maintained by Mahmoud Al-Qudsi \<mqudsi@neosmart.net\> on behalf of [NeoSmart Technologies](https://neosmart.net/), and is released completely open source under the terms of the MIT license. See the `LICENSE` file for further information.
 
 
 ##Modes of Operation
